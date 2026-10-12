@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-cards-cache-v1';
+const CACHE_NAME = 'life-cards-cache-v2'; // change v1 to v2
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
