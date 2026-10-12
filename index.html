@@ -97,10 +97,10 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
 
-    /* 优化照片容器：竖屏照片不再裁切顶部与头部，完整展示 */
+    /* 竖屏照片完整展示容器 */
     .card-img-wrap {
       width: 100%;
-      background: #1a1a1a;
+      background: #111;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -108,7 +108,7 @@
     .card-img {
       width: 100%;
       max-height: 480px;
-      object-fit: contain; /* 保证整张照片完整可见，不裁剪顶部 */
+      object-fit: contain;
       display: block;
     }
 
@@ -227,9 +227,8 @@
       padding: 4px 6px;
     }
 
-    /* 编辑时图片预览小图 */
     .preview-box {
-      margin-top: 6px;
+      margin-top: 8px;
       display: none;
       align-items: center;
       gap: 10px;
@@ -269,7 +268,6 @@
     <div class="modal">
       <h2 id="modalTitle">新增人生卡片 (5W1H)</h2>
       <form id="recordForm" onsubmit="saveCardData(event)">
-        <!-- 隐藏 ID，用于判断是新增还是更新 -->
         <input type="hidden" id="editCardId" value="" />
 
         <div class="group">
@@ -303,7 +301,7 @@
           <input type="file" id="fPhoto" accept="image/*" onchange="onPhotoSelected(this)" />
           <div id="existingPhotoPreview" class="preview-box">
             <img id="previewImg" src="" alt="预览" />
-            <span>已保留原照片 (如需更换可重新选择)</span>
+            <span>已保留原照片 (如需更换可直接重新选图)</span>
           </div>
         </div>
 
@@ -352,7 +350,7 @@
       }
     ];
     let currentCategory = "全部";
-    let editingCardImageCache = null; // 缓存编辑中卡片原本的图片
+    let editingCardImageCache = null;
 
     function saveAll() {
       localStorage.setItem("demo_categories", JSON.stringify(categories));
@@ -388,7 +386,14 @@
       categories.forEach((cat, idx) => {
         const item = document.createElement("div");
         item.className = "cat-item";
-        item.innerHTML = '<span>' + cat + '</span><button class="cat-item-del" onclick="handleRemoveCategory(' + idx + ')">删除</button>';
+        const span = document.createElement("span");
+        span.innerText = cat;
+        const delBtn = document.createElement("button");
+        delBtn.className = "cat-item-del";
+        delBtn.innerText = "删除";
+        delBtn.onclick = () => handleRemoveCategory(idx);
+        item.appendChild(span);
+        item.appendChild(delBtn);
         catList.appendChild(item);
       });
     }
@@ -406,7 +411,7 @@
     function handleRemoveCategory(idx) {
       if (categories.length <= 1) { alert("请至少保留一个分类！"); return; }
       const target = categories[idx];
-      if (confirm('确定删除圈层“' + target + '”吗？')) {
+      if (confirm(`确定删除圈层“${target}”吗？`)) {
         categories.splice(idx, 1);
         if (currentCategory === target) currentCategory = "全部";
         saveAll();
@@ -435,29 +440,69 @@
       const filtered = localCards.filter(c => currentCategory === "全部" || c.category === currentCategory);
 
       if (filtered.length === 0) {
-        box.innerHTML = '<div class="empty-hint">暂无“' + currentCategory + '”的卡片。<br/>点击下方按钮记下第一张吧 ✨</div>';
+        box.innerHTML = `<div class="empty-hint">暂无“${currentCategory}”的卡片。<br/>点击下方按钮记下第一张吧 ✨</div>`;
         return;
       }
 
       filtered.forEach(c => {
         const card = document.createElement("div");
         card.className = "life-card";
-        card.innerHTML = 
-          (c.image ? '<div class="card-img-wrap"><img class="card-img" src="' + c.image + '" alt="' + c.title + '" /></div>' : '') +
-          '<div class="card-body">' +
-            '<div class="tags">' +
-              '<span class="tag when">📅 ' + (c.date || "未标注") + '</span>' +
-              (c.location ? '<span class="tag">📍 ' + c.location + '</span>' : '') +
-              (c.who ? '<span class="tag who">👤 ' + c.who + '</span>' : '') +
-              '<span class="tag">' + c.category + '</span>' +
-            '</div>' +
-            '<h3 class="card-title">' + c.title + '</h3>' +
-            '<p class="card-text">' + (c.story || "") + '</p>' +
-            '<div class="card-footer">' +
-              '<button class="btn-action btn-edit" onclick="openEditDialog(\\'' + c.id + '\\')">✏️ 编辑</button>' +
-              '<button class="btn-action btn-del" onclick="deleteCard(\\'' + c.id + '\\')">🗑️ 删除</button>' +
-            '</div>' +
-          '</div>';
+
+        // 图片容器
+        if (c.image) {
+          const imgWrap = document.createElement("div");
+          imgWrap.className = "card-img-wrap";
+          const img = document.createElement("img");
+          img.className = "card-img";
+          img.src = c.image;
+          img.alt = c.title;
+          imgWrap.appendChild(img);
+          card.appendChild(imgWrap);
+        }
+
+        // 内容体
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const tags = document.createElement("div");
+        tags.className = "tags";
+        tags.innerHTML = `
+          <span class="tag when">📅 ${c.date || "未标注"}</span>
+          ${c.location ? `<span class="tag">📍 ${c.location}</span>` : ""}
+          ${c.who ? `<span class="tag who">👤 ${c.who}</span>` : ""}
+          <span class="tag">${c.category}</span>
+        `;
+        body.appendChild(tags);
+
+        const title = document.createElement("h3");
+        title.className = "card-title";
+        title.innerText = c.title;
+        body.appendChild(title);
+
+        const story = document.createElement("p");
+        story.className = "card-text";
+        story.innerText = c.story || "";
+        body.appendChild(story);
+
+        // 底部操作按钮
+        const footer = document.createElement("div");
+        footer.className = "card-footer";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-action btn-edit";
+        editBtn.innerText = "✏️ 编辑";
+        editBtn.onclick = () => openEditDialog(c.id);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn-action btn-del";
+        delBtn.innerText = "🗑️ 删除";
+        delBtn.onclick = () => deleteCard(c.id);
+
+        footer.appendChild(editBtn);
+        footer.appendChild(delBtn);
+        body.appendChild(footer);
+
+        card.appendChild(body);
         box.appendChild(card);
       });
     }
@@ -486,7 +531,6 @@
       });
     }
 
-    /* 打开新建卡片 */
     function openCreateDialog() {
       document.getElementById("modalTitle").innerText = "新增人生卡片 (5W1H)";
       document.getElementById("editCardId").value = "";
@@ -497,7 +541,6 @@
       document.getElementById("dialogMask").classList.add("open");
     }
 
-    /* 打开编辑已有卡片 */
     function openEditDialog(cardId) {
       const card = localCards.find(c => c.id === cardId);
       if (!card) return;
@@ -510,10 +553,106 @@
       document.getElementById("fLocation").value = card.location || "";
       document.getElementById("fWho").value = card.who || "";
       document.getElementById("fStory").value = card.story || "";
-      document.getElementById("fPhoto").value = ""; // 清空 file input
+      document.getElementById("fPhoto").value = "";
 
       editingCardImageCache = card.image || null;
       const previewBox = document.getElementById("existingPhotoPreview");
       if (card.image) {
         document.getElementById("previewImg").src = card.image;
-        previewBox.
+        previewBox.style.display = "flex";
+      } else {
+        previewBox.style.display = "none";
+      }
+
+      document.getElementById("dialogMask").classList.add("open");
+    }
+
+    function onPhotoSelected(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById("existingPhotoPreview").style.display = "none";
+      }
+    }
+
+    async function saveCardData(e) {
+      e.preventDefault();
+      const btn = document.getElementById("submitBtn");
+      btn.innerText = "保存中...";
+      btn.disabled = true;
+
+      try {
+        const editId = document.getElementById("editCardId").value;
+        const file = document.getElementById("fPhoto").files[0];
+        
+        let finalImage = editingCardImageCache;
+        if (file) {
+          finalImage = await compressImage(file);
+        }
+
+        if (editId) {
+          const idx = localCards.findIndex(c => c.id === editId);
+          if (idx !== -1) {
+            localCards[idx].category = document.getElementById("fCategory").value;
+            localCards[idx].title = document.getElementById("fTitle").value;
+            localCards[idx].date = document.getElementById("fDate").value;
+            localCards[idx].location = document.getElementById("fLocation").value;
+            localCards[idx].who = document.getElementById("fWho").value;
+            localCards[idx].story = document.getElementById("fStory").value;
+            localCards[idx].image = finalImage;
+          }
+        } else {
+          const newCard = {
+            id: "card_" + Date.now(),
+            category: document.getElementById("fCategory").value,
+            title: document.getElementById("fTitle").value,
+            date: document.getElementById("fDate").value,
+            location: document.getElementById("fLocation").value,
+            who: document.getElementById("fWho").value,
+            story: document.getElementById("fStory").value,
+            image: finalImage
+          };
+          localCards.unshift(newCard);
+        }
+
+        saveAll();
+        closeDialog();
+        renderCards();
+      } finally {
+        btn.innerText = "保存卡片";
+        btn.disabled = false;
+      }
+    }
+
+    function deleteCard(id) {
+      if (confirm("确定要删除这张卡片吗？")) {
+        localCards = localCards.filter(c => c.id !== id);
+        saveAll();
+        renderCards();
+      }
+    }
+
+    function setTab(cat) {
+      currentCategory = cat;
+      renderCategoryUI();
+      renderCards();
+    }
+
+    function closeDialog() {
+      document.getElementById("dialogMask").classList.remove("open");
+    }
+    function openCatModal() {
+      document.getElementById("catModalMask").classList.add("open");
+    }
+    function closeCatModal() {
+      document.getElementById("catModalMask").classList.remove("open");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderCategoryUI();
+      renderCards();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>
