@@ -4,30 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>我的人生卡片</title>
-
-  <!-- PWA 支持 -->
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#2d5a43" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="人生卡片" />
-
   <style>
     :root {
-      --bg: #f7f5f0;
+      --bg: #f8f6f0;
       --card-bg: #ffffff;
       --primary: #2d5a43;
       --accent: #d97736;
-      --text: #2b2b2b;
-      --muted: #6b6b6b;
-      --border: #e6e2da;
+      --text: #2d2d2d;
+      --muted: #6e6e6e;
+      --border: #e3ded6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      max-width: 600px;
+      max-width: 540px;
       margin: 0 auto;
       padding: 16px 16px 90px;
     }
@@ -37,16 +34,16 @@
       align-items: center;
       margin-bottom: 14px;
     }
-    h1 { font-size: 22px; color: var(--primary); }
+    h1 { font-size: 21px; color: var(--primary); font-weight: 700; }
     .status-badge {
       font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 12px;
-      background: #e1efe6;
+      padding: 4px 10px;
+      border-radius: 14px;
+      background: #e2efe7;
       color: var(--primary);
+      font-weight: 500;
     }
-    
-    /* 圈层切换标签栏 */
+
     .tabs-wrapper {
       display: flex;
       align-items: center;
@@ -63,7 +60,7 @@
     }
     .tabs::-webkit-scrollbar { display: none; }
     .tab-btn {
-      padding: 8px 14px;
+      padding: 7px 14px;
       border: 1px solid var(--border);
       background: #fff;
       border-radius: 20px;
@@ -77,65 +74,80 @@
       background: var(--primary);
       color: #fff;
       border-color: var(--primary);
-      font-weight: 500;
+      font-weight: 600;
     }
     .manage-cat-btn {
-      padding: 8px 10px;
-      background: #eee8de;
+      padding: 7px 12px;
+      background: #ece6dc;
       border: 1px solid var(--border);
       border-radius: 20px;
       font-size: 12px;
       color: var(--text);
       cursor: pointer;
       white-space: nowrap;
+      font-weight: 500;
     }
 
-    .card-list { display: flex; flex-direction: column; gap: 16px; }
+    .card-list { display: flex; flex-direction: column; gap: 14px; }
     .life-card {
       background: var(--card-bg);
       border-radius: 14px;
       border: 1px solid var(--border);
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+    /* 优化照片容器：竖屏照片不再裁切顶部与头部，完整展示 */
+    .card-img-wrap {
+      width: 100%;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .card-img {
       width: 100%;
-      max-height: 280px;
-      object-fit: cover;
+      max-height: 480px;
+      object-fit: contain; /* 保证整张照片完整可见，不裁剪顶部 */
       display: block;
-      background: #eae7e1;
     }
-    .card-body { padding: 16px; }
+
+    .card-body { padding: 15px; }
     .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .tag {
       font-size: 11px;
       padding: 3px 8px;
       border-radius: 6px;
-      background: #eeebe3;
+      background: #f0ece5;
       color: #555;
     }
-    .tag.when { background: #faede2; color: var(--accent); }
-    .tag.who { background: #e6f3eb; color: var(--primary); }
-    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-    .card-text { font-size: 15px; line-height: 1.6; color: #444; white-space: pre-wrap; }
+    .tag.when { background: #faeee4; color: var(--accent); }
+    .tag.who { background: #e7f3eb; color: var(--primary); font-weight: 500; }
+    .card-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: #1f1f1f; }
+    .card-text { font-size: 14px; line-height: 1.6; color: #444; white-space: pre-wrap; }
+
     .card-footer {
       display: flex;
       justify-content: flex-end;
+      gap: 12px;
       margin-top: 12px;
       border-top: 1px dashed var(--border);
       padding-top: 8px;
     }
-    .btn-del {
-      font-size: 12px;
-      color: #b84040;
+    .btn-action {
+      font-size: 13px;
       background: none;
       border: none;
       cursor: pointer;
-      padding: 4px;
+      padding: 4px 6px;
+      font-weight: 500;
     }
+    .btn-edit { color: var(--primary); }
+    .btn-del { color: #b84040; }
+
     .fab {
       position: fixed;
-      bottom: 20px;
+      bottom: 22px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--primary);
@@ -144,18 +156,17 @@
       font-weight: 600;
       border: none;
       border-radius: 30px;
-      padding: 12px 26px;
+      padding: 12px 28px;
       box-shadow: 0 4px 14px rgba(45,90,67,0.3);
       cursor: pointer;
       z-index: 10;
     }
 
-    /* 弹窗通用样式 */
     .modal-mask {
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.45);
+      background: rgba(0,0,0,0.5);
       z-index: 99;
       justify-content: center;
       align-items: flex-end;
@@ -164,8 +175,8 @@
     .modal {
       background: #fff;
       width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
+      max-width: 540px;
+      max-height: 88vh;
       border-radius: 20px 20px 0 0;
       padding: 20px;
       overflow-y: auto;
@@ -178,10 +189,10 @@
       padding: 10px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 15px;
+      font-size: 14px;
       font-family: inherit;
     }
-    textarea { height: 90px; resize: none; }
+    textarea { height: 85px; resize: none; }
     .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
     .modal-btns button {
       flex: 1;
@@ -196,59 +207,71 @@
     .btn-submit { background: var(--primary); color: #fff; }
     .empty-hint { text-align: center; color: var(--muted); margin-top: 50px; font-size: 14px; line-height: 1.8; }
 
-    /* 圈层管理列表样式 */
     .cat-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
       margin-bottom: 8px;
-      background: #faf9f6;
+      background: #faf8f5;
     }
     .cat-item span { font-size: 14px; font-weight: 500; }
     .cat-item-del {
       background: none;
       border: none;
       color: #b84040;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 4px 6px;
+    }
+
+    /* 编辑时图片预览小图 */
+    .preview-box {
+      margin-top: 6px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .preview-box img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
     }
   </style>
-
-  <!-- Firebase Web SDK (compat 模式) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
   <header>
     <div>
       <h1>🌿 我的人生卡片</h1>
-      <p style="font-size: 12px; color: var(--muted);">给儿子的岁月手账</p>
+      <p style="font-size: 12px; color: var(--muted);">给儿子的岁月回忆手账</p>
     </div>
-    <span id="cloudStatus" class="status-badge">☁️ 云端同步</span>
+    <span class="status-badge">💾 本地安全保存</span>
   </header>
 
-  <!-- 圈层筛选与动态管理入口 -->
   <div class="tabs-wrapper">
     <div id="tabsContainer" class="tabs"></div>
     <button class="manage-cat-btn" onclick="openCatModal()">⚙️ 管理</button>
   </div>
 
-  <!-- 卡片流 -->
   <div id="cardContainer" class="card-list"></div>
 
-  <!-- 记卡片浮动按钮 -->
-  <button class="fab" onclick="openDialog()">+ 记一张新卡片</button>
+  <button class="fab" onclick="openCreateDialog()">+ 记一张新卡片</button>
 
-  <!-- 记卡片弹窗 -->
+  <!-- 录入与编辑卡片弹窗 -->
   <div id="dialogMask" class="modal-mask">
     <div class="modal">
-      <h2>新增人生卡片 (5W1H)</h2>
+      <h2 id="modalTitle">新增人生卡片 (5W1H)</h2>
       <form id="recordForm" onsubmit="saveCardData(event)">
+        <!-- 隐藏 ID，用于判断是新增还是更新 -->
+        <input type="hidden" id="editCardId" value="" />
+
         <div class="group">
           <label>圈层分类</label>
           <select id="fCategory" onchange="checkNewCategorySelect(this)" required></select>
@@ -256,7 +279,7 @@
 
         <div class="group">
           <label>事件标题 (What)</label>
-          <input type="text" id="fTitle" placeholder="如：教儿子学自行车、旧厨房的味道" required />
+          <input type="text" id="fTitle" placeholder="如：教儿子骑自行车、老厨房里的味道" required />
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -272,17 +295,21 @@
 
         <div class="group">
           <label>关键人物 (Who)</label>
-          <input type="text" id="fWho" placeholder="如：儿子、老公、外婆" />
+          <input type="text" id="fWho" placeholder="如：儿子、老公、学生们" />
         </div>
 
         <div class="group">
-          <label>老照片 (自动压缩清晰保存)</label>
-          <input type="file" id="fPhoto" accept="image/*" />
+          <label>老照片 (选择后自动压缩，不裁切)</label>
+          <input type="file" id="fPhoto" accept="image/*" onchange="onPhotoSelected(this)" />
+          <div id="existingPhotoPreview" class="preview-box">
+            <img id="previewImg" src="" alt="预览" />
+            <span>已保留原照片 (如需更换可重新选择)</span>
+          </div>
         </div>
 
         <div class="group">
           <label>故事 / 想对他说的心里话</label>
-          <textarea id="fStory" placeholder="写下一两句当天的回忆、心情或人生体悟..."></textarea>
+          <textarea id="fStory" placeholder="写下一两句当天的回忆、心情或想传授给他的经验..."></textarea>
         </div>
 
         <div class="modal-btns">
@@ -293,21 +320,16 @@
     </div>
   </div>
 
-  <!-- 圈层动态管理弹窗 -->
+  <!-- 圈层管理弹窗 -->
   <div id="catModalMask" class="modal-mask">
     <div class="modal">
       <h2>⚙️ 管理人生圈层</h2>
-      <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">
-        您可以根据人生的不同阶段，自由添加或移除圈层。
-      </p>
-
+      <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">您可以随时添加或删除分类，已创建的卡片不会丢失。</p>
       <div class="group" style="display: flex; gap: 8px;">
-        <input type="text" id="newCatInput" placeholder="输入新圈层名称 (如: 教学记忆、独处)" />
-        <button type="button" onclick="handleAddCategory()" style="width: 80px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">添加</button>
+        <input type="text" id="newCatInput" placeholder="输入新圈层 (如: 教学生涯、独处时光)" />
+        <button type="button" onclick="handleAddCategory()" style="width: 76px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">添加</button>
       </div>
-
-      <div id="categoryList" style="margin-top: 14px; max-height: 240px; overflow-y: auto;"></div>
-
+      <div id="categoryList" style="margin-top: 12px; max-height: 220px; overflow-y: auto;"></div>
       <div class="modal-btns" style="margin-top: 14px;">
         <button type="button" class="btn-cancel" onclick="closeCatModal()">完成</button>
       </div>
@@ -315,33 +337,39 @@
   </div>
 
   <script>
-    /* ==========================================================
-       1. 默认圈层与动态存储管理
-       ========================================================== */
     const DEFAULT_CATEGORIES = ["家人 (儿子/老公)", "父母兄弟姐妹", "朋友/同学/同事"];
-    let categories = JSON.parse(localStorage.getItem("life_categories")) || DEFAULT_CATEGORIES;
+    let categories = JSON.parse(localStorage.getItem("demo_categories")) || DEFAULT_CATEGORIES;
+    let localCards = JSON.parse(localStorage.getItem("demo_cards")) || [
+      {
+        id: "demo_1",
+        category: "家人 (儿子/老公)",
+        title: "第一次教儿子学单车",
+        date: "2006-05-18",
+        location: "社区小公园",
+        who: "儿子、我",
+        story: "那天阳光很暖，你在前面摇摇晃晃，我在后面一路小跑护着你。转弯时你突然回头笑，那一刻觉得我的小孩真的长大了。",
+        image: null
+      }
+    ];
     let currentCategory = "全部";
+    let editingCardImageCache = null; // 缓存编辑中卡片原本的图片
 
-    function saveCategories() {
-      localStorage.setItem("life_categories", JSON.stringify(categories));
-      renderCategoryUI();
+    function saveAll() {
+      localStorage.setItem("demo_categories", JSON.stringify(categories));
+      localStorage.setItem("demo_cards", JSON.stringify(localCards));
     }
 
     function renderCategoryUI() {
-      // 1. 渲染顶部 Tabs
-      const tabsContainer = document.getElementById("tabsContainer");
-      tabsContainer.innerHTML = "";
-
-      const allTabs = ["全部", ...categories];
-      allTabs.forEach(cat => {
+      const tabs = document.getElementById("tabsContainer");
+      tabs.innerHTML = "";
+      ["全部", ...categories].forEach(cat => {
         const btn = document.createElement("button");
-        btn.className = `tab-btn ${currentCategory === cat ? 'active' : ''}`;
+        btn.className = "tab-btn " + (currentCategory === cat ? 'active' : '');
         btn.innerText = cat;
         btn.onclick = () => setTab(cat);
-        tabsContainer.appendChild(btn);
+        tabs.appendChild(btn);
       });
 
-      // 2. 渲染写卡片弹窗的 Select 选项
       const select = document.getElementById("fCategory");
       select.innerHTML = "";
       categories.forEach(cat => {
@@ -350,108 +378,90 @@
         opt.innerText = cat;
         select.appendChild(opt);
       });
-      // 附带一个快速新增项
       const addOpt = document.createElement("option");
       addOpt.value = "__ADD_NEW__";
       addOpt.innerText = "➕ 自定义新圈层...";
       select.appendChild(addOpt);
 
-      // 3. 渲染管理弹窗中的列表
-      const catListEl = document.getElementById("categoryList");
-      catListEl.innerHTML = "";
+      const catList = document.getElementById("categoryList");
+      catList.innerHTML = "";
       categories.forEach((cat, idx) => {
         const item = document.createElement("div");
         item.className = "cat-item";
-        item.innerHTML = `
-          <span>${cat}</span>
-          <button class="cat-item-del" onclick="handleRemoveCategory(${idx})">删除</button>
-        `;
-        catListEl.appendChild(item);
+        item.innerHTML = '<span>' + cat + '</span><button class="cat-item-del" onclick="handleRemoveCategory(' + idx + ')">删除</button>';
+        catList.appendChild(item);
       });
     }
 
-    function handleAddCategory(name) {
-      const val = name || document.getElementById("newCatInput").value.trim();
+    function handleAddCategory() {
+      const val = document.getElementById("newCatInput").value.trim();
       if (!val) return;
-      if (categories.includes(val)) {
-        alert("该圈层已存在！");
-        return;
-      }
+      if (categories.includes(val)) { alert("该圈层已存在！"); return; }
       categories.push(val);
-      saveCategories();
+      saveAll();
+      renderCategoryUI();
       document.getElementById("newCatInput").value = "";
     }
 
-    function handleRemoveCategory(index) {
-      if (categories.length <= 1) {
-        alert("至少保留一个分类哦！");
-        return;
-      }
-      const target = categories[index];
-      if (confirm(`确定删除圈层“${target}”吗？(已创建的卡片仍会保留)`)) {
-        categories.splice(index, 1);
+    function handleRemoveCategory(idx) {
+      if (categories.length <= 1) { alert("请至少保留一个分类！"); return; }
+      const target = categories[idx];
+      if (confirm('确定删除圈层“' + target + '”吗？')) {
+        categories.splice(idx, 1);
         if (currentCategory === target) currentCategory = "全部";
-        saveCategories();
-        renderUI();
+        saveAll();
+        renderCategoryUI();
+        renderCards();
       }
     }
 
     function checkNewCategorySelect(el) {
       if (el.value === "__ADD_NEW__") {
-        const customName = prompt("请输入新的圈层名称：");
-        if (customName && customName.trim()) {
-          handleAddCategory(customName.trim());
-          el.value = customName.trim();
+        const name = prompt("请输入新圈层名称：");
+        if (name && name.trim()) {
+          categories.push(name.trim());
+          saveAll();
+          renderCategoryUI();
+          el.value = name.trim();
         } else {
           el.value = categories[0] || "";
         }
       }
     }
 
-    function openCatModal() {
-      document.getElementById("catModalMask").classList.add("open");
-    }
-    function closeCatModal() {
-      document.getElementById("catModalMask").classList.remove("open");
-    }
+    function renderCards() {
+      const box = document.getElementById("cardContainer");
+      box.innerHTML = "";
+      const filtered = localCards.filter(c => currentCategory === "全部" || c.category === currentCategory);
 
-    /* ==========================================================
-       2. Firebase 云端与本地离线持久化
-       ========================================================== */
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
-    };
-
-    let db = null;
-    let isCloudActive = false;
-    let localCards = [];
-
-    if (firebaseConfig.projectId !== "YOUR_PROJECT_ID") {
-      try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        db.enablePersistence().catch(() => {});
-        isCloudActive = true;
-      } catch (e) {
-        console.warn("切入纯本地离线模式");
+      if (filtered.length === 0) {
+        box.innerHTML = '<div class="empty-hint">暂无“' + currentCategory + '”的卡片。<br/>点击下方按钮记下第一张吧 ✨</div>';
+        return;
       }
+
+      filtered.forEach(c => {
+        const card = document.createElement("div");
+        card.className = "life-card";
+        card.innerHTML = 
+          (c.image ? '<div class="card-img-wrap"><img class="card-img" src="' + c.image + '" alt="' + c.title + '" /></div>' : '') +
+          '<div class="card-body">' +
+            '<div class="tags">' +
+              '<span class="tag when">📅 ' + (c.date || "未标注") + '</span>' +
+              (c.location ? '<span class="tag">📍 ' + c.location + '</span>' : '') +
+              (c.who ? '<span class="tag who">👤 ' + c.who + '</span>' : '') +
+              '<span class="tag">' + c.category + '</span>' +
+            '</div>' +
+            '<h3 class="card-title">' + c.title + '</h3>' +
+            '<p class="card-text">' + (c.story || "") + '</p>' +
+            '<div class="card-footer">' +
+              '<button class="btn-action btn-edit" onclick="openEditDialog(\\'' + c.id + '\\')">✏️ 编辑</button>' +
+              '<button class="btn-action btn-del" onclick="deleteCard(\\'' + c.id + '\\')">🗑️ 删除</button>' +
+            '</div>' +
+          '</div>';
+        box.appendChild(card);
+      });
     }
 
-    if (!isCloudActive) {
-      document.getElementById("cloudStatus").innerText = "💾 本地模式";
-      document.getElementById("cloudStatus").style.background = "#eee";
-      document.getElementById("cloudStatus").style.color = "#666";
-      localCards = JSON.parse(localStorage.getItem("life_cards_cache") || "[]");
-    }
-
-    /* ==========================================================
-       3. 照片轻量压缩与卡片保存
-       ========================================================== */
     function compressImage(file, maxDimension = 900) {
       return new Promise((resolve) => {
         if (!file) return resolve(null);
@@ -459,7 +469,7 @@
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           const img = new Image();
-          img.src = event.target.result;
+          img.src = e.target.result;
           img.onload = () => {
             const canvas = document.createElement("canvas");
             let w = img.width, h = img.height;
@@ -476,129 +486,34 @@
       });
     }
 
-    function bindRealtimeSync() {
-      if (isCloudActive) {
-        db.collection("cards").orderBy("date", "desc").onSnapshot((snapshot) => {
-          localCards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          renderUI();
-        });
-      } else {
-        renderUI();
-      }
-    }
-
-    async function saveCardData(e) {
-      e.preventDefault();
-      const btn = document.getElementById("submitBtn");
-      btn.innerText = "保存中...";
-      btn.disabled = true;
-
-      try {
-        const file = document.getElementById("fPhoto").files[0];
-        const compressedImg = await compressImage(file);
-
-        const cardData = {
-          category: document.getElementById("fCategory").value,
-          title: document.getElementById("fTitle").value,
-          date: document.getElementById("fDate").value,
-          location: document.getElementById("fLocation").value,
-          who: document.getElementById("fWho").value,
-          story: document.getElementById("fStory").value,
-          image: compressedImg,
-          timestamp: Date.now()
-        };
-
-        if (isCloudActive) {
-          await db.collection("cards").add(cardData);
-        } else {
-          cardData.id = "card_" + Date.now();
-          localCards.unshift(cardData);
-          localStorage.setItem("life_cards_cache", JSON.stringify(localCards));
-          renderUI();
-        }
-
-        closeDialog();
-        document.getElementById("recordForm").reset();
-      } catch (err) {
-        alert("保存失败: " + err.message);
-      } finally {
-        btn.innerText = "保存卡片";
-        btn.disabled = false;
-      }
-    }
-
-    async function deleteCard(id) {
-      if (!confirm("确定删除这张卡片吗？")) return;
-      if (isCloudActive) {
-        await db.collection("cards").doc(id).delete();
-      } else {
-        localCards = localCards.filter(c => c.id !== id);
-        localStorage.setItem("life_cards_cache", JSON.stringify(localCards));
-        renderUI();
-      }
-    }
-
-    function renderUI() {
-      const listEl = document.getElementById("cardContainer");
-      listEl.innerHTML = "";
-
-      const filtered = localCards.filter(c => currentCategory === "全部" || c.category === currentCategory);
-
-      if (filtered.length === 0) {
-        listEl.innerHTML = `
-          <div class="empty-hint">
-            还没有“${currentCategory}”的卡片。<br/>
-            点击下方按钮，写下第一段给儿子的回忆吧 ✨
-          </div>`;
-        return;
-      }
-
-      filtered.forEach(c => {
-        const item = document.createElement("div");
-        item.className = "life-card";
-        item.innerHTML = `
-          ${c.image ? `<img class="card-img" src="${c.image}" alt="${c.title}" />` : ""}
-          <div class="card-body">
-            <div class="tags">
-              <span class="tag when">📅 ${c.date || "未标注"}</span>
-              ${c.location ? `<span class="tag">📍 ${c.location}</span>` : ""}
-              ${c.who ? `<span class="tag who">👤 ${c.who}</span>` : ""}
-              <span class="tag">${c.category}</span>
-            </div>
-            <h3 class="card-title">${c.title}</h3>
-            <p class="card-text">${c.story || ""}</p>
-            <div class="card-footer">
-              <button class="btn-del" onclick="deleteCard('${c.id}')">删除</button>
-            </div>
-          </div>
-        `;
-        listEl.appendChild(item);
-      });
-    }
-
-    function setTab(cat) {
-      currentCategory = cat;
-      renderCategoryUI();
-      renderUI();
-    }
-
-    function openDialog() {
+    /* 打开新建卡片 */
+    function openCreateDialog() {
+      document.getElementById("modalTitle").innerText = "新增人生卡片 (5W1H)";
+      document.getElementById("editCardId").value = "";
+      document.getElementById("recordForm").reset();
       document.getElementById("fDate").value = new Date().toISOString().split("T")[0];
+      editingCardImageCache = null;
+      document.getElementById("existingPhotoPreview").style.display = "none";
       document.getElementById("dialogMask").classList.add("open");
     }
 
-    function closeDialog() {
-      document.getElementById("dialogMask").classList.remove("open");
-    }
+    /* 打开编辑已有卡片 */
+    function openEditDialog(cardId) {
+      const card = localCards.find(c => c.id === cardId);
+      if (!card) return;
 
-    // 初始化注册
-    window.addEventListener("DOMContentLoaded", () => {
-      renderCategoryUI();
-      bindRealtimeSync();
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      }
-    });
-  </script>
-</body>
-</html>
+      document.getElementById("modalTitle").innerText = "编辑人生卡片";
+      document.getElementById("editCardId").value = card.id;
+      document.getElementById("fCategory").value = card.category;
+      document.getElementById("fTitle").value = card.title;
+      document.getElementById("fDate").value = card.date;
+      document.getElementById("fLocation").value = card.location || "";
+      document.getElementById("fWho").value = card.who || "";
+      document.getElementById("fStory").value = card.story || "";
+      document.getElementById("fPhoto").value = ""; // 清空 file input
+
+      editingCardImageCache = card.image || null;
+      const previewBox = document.getElementById("existingPhotoPreview");
+      if (card.image) {
+        document.getElementById("previewImg").src = card.image;
+        previewBox.
